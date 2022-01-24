@@ -1,0 +1,12 @@
+home-assistant*
+.HA_VERSION
+.storage/
+OZW_Log.txt
+blueprints
+pyozw.sqlite
+secrets.yaml
+zwcfg_0xe477f4da.xml
+zwscene.xml
+options.xml
+scenes.yaml
+scripts.yaml

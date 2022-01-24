@@ -1,0 +1,61 @@
+- alias: Light Integration
+  id: light_integration
+  initial_state: True
+  trigger:
+    - platform: time_pattern
+      seconds: "/10"
+  action:
+    service: python_script.growlights
+    data:
+      period: "{{ states.input_number.growlight_period.state | int }}"
+      light: "{{ states.sensor.luminance.state | float }}"
+      cycles: "{{ states.input_number.growlight_cycles.state | int }}"
+      setpoint: "{{ states.input_number.light_setpoint.state | float }}"
+      threshold: "{{ states.input_number.light_threshold.state | int }}"
+      permissive: "{{ states.input_boolean.can_enable_growlights.state }}"
+      status: "{{ states.input_boolean.growlight_on.state }}"
+      hysteresis: "{{ states.input_number.growlight_hysteresis.state | int }}"
+- alias: Auto Humidity
+  id: auto_humidity
+  initial_state: True
+  trigger:
+    - platform: time_pattern
+      minutes: "/1"
+  action:
+    service: python_script.humidifier
+    data:
+      setpoint: "{{ states.input_number.humidity_setpoint.state | int }}"
+      forecast_temp: "{{ states.sensor.calgary_olympic_park_low_temperature.state | float }}"
+      actual_temp: "{{ states.sensor.calgary_olympic_park_temperature.state | float }}"
+      actual: "{{ states.sensor.humidity.state | float }}"
+      offset: "{{ states.input_number.humidity_offset.state | int }}"
+      status: "{{ states.input_boolean.humidifier_on.state }}"
+- alias: Light Reset
+  id: light_reset
+  initial_state: True
+  trigger:
+    - platform: sun
+      event: "sunrise"
+      offset: "2:00:00"
+  action:
+    service: python_script.growlights_reset
+- alias: Humidifier On
+  id: humidifer_on
+  initial_state: False
+  trigger:
+    - platform: template
+      value_template: "{{ states.sensor.humidity.state | int < (states.input_number.humidity_setpoint.state | int - 1) }}"
+  action:
+    service: switch.turn_on
+    target:
+      entity_id: switch.humidifier
+- alias: Humidifier Off
+  id: humidifer_off
+  initial_state: False
+  trigger:
+    - platform: template
+      value_template: "{{ states.sensor.humidity.state | int > (states.input_number.humidity_setpoint.state | int + 1) }}"
+  action:
+    service: switch.turn_off
+    target:
+      entity_id: switch.humidifier
