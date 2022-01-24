@@ -12,7 +12,9 @@ an accumulated light period.
 ### User Inputs
 
 Setpoint - Desired hours of light
+
 Threshold - Light level at which the lights will turn on
+
 Hysteresis - A buffer around the light level so the lights don't flicker
 
 
